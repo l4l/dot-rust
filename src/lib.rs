@@ -390,28 +390,7 @@ impl<'a> Id<'a> {
     /// Passing an invalid string (containing spaces, brackets,
     /// quotes, ...) will return an empty `Err` value.
     pub fn new<Name: Into<Cow<'a, str>>>(name: Name) -> Result<Id<'a>, ()> {
-        let name = name.into();
-        {
-            let mut chars = name.chars();
-            match chars.next() {
-                Some(c) if is_letter_or_underscore(c) => {}
-                _ => return Err(()),
-            }
-            if !chars.all(is_constituent) {
-                return Err(())
-            }
-        }
-        return Ok(Id{ name: name });
-
-        fn is_letter_or_underscore(c: char) -> bool {
-            in_range('a', c, 'z') || in_range('A', c, 'Z') || c == '_'
-        }
-        fn is_constituent(c: char) -> bool {
-            is_letter_or_underscore(c) || in_range('0', c, '9')
-        }
-        fn in_range(low: char, c: char, high: char) -> bool {
-            low as usize <= c as usize && c as usize <= high as usize
-        }
+        Ok(Id{ name: name.into() })
     }
 
     pub fn as_slice(&'a self) -> &'a str {
@@ -833,7 +812,7 @@ impl Kind {
     /// Determines which edge syntax must be used, and default style.
     fn keyword(&self) -> &'static str {
         match *self {
-            Kind::Digraph => "digraph",
+            Kind::Digraph => "strict digraph",
             Kind::Graph => "graph"
         }
     }
